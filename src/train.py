@@ -1,6 +1,6 @@
 import pandas as pd
-import numpy as np
 import json
+import os
 
 from datasets import Dataset, DatasetDict
 from transformers import (
@@ -11,28 +11,31 @@ from transformers import (
 )
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, mean_squared_error
+from datetime import datetime
+
+dt_string = '_'.join(str(datetime.now()).split('.')[0].split())
 
 num_epochs = 1
-batch_size = 8
+batch_size = 32
 
-json_path_train = './gz_all.json'
-json_path_test = './gz_100.json'
+json_path_train = './data/gz_all.json'
+json_path_test = './data/gz_101.json'
 
 with open(json_path_train, 'r', encoding='utf8') as f:
     data_train = json.load(f)
 data_train = [el for el in data_train if 'difficulty' in el.keys()]
-# data_train = data_train[:10]
 
 with open(json_path_test, 'r', encoding='utf8') as f:
     data_test = json.load(f)
 data_test = [el for el in data_test if 'difficulty' in el.keys()]
-# data_test = data_test[:10]
 
 df_train = pd.DataFrame(data_train)
-print(f'Train value counts: {df_train['difficulty'].value_counts()}')
+print(f"Train value counts: {df_train['difficulty'].value_counts()}")
+print(f"Total train samples: {len(df_train)}")
 
 df_test = pd.DataFrame(data_test)
-print(f'Test value counts: {df_test['difficulty'].value_counts()}')
+print(f"Test value counts: {df_test['difficulty'].value_counts()}")
+print(f"Total train samples: {len(df_test)}")
 
 # Label mapping
 label_map = {
@@ -48,12 +51,17 @@ df_train, df_val = train_test_split(df_train, test_size=0.2, random_state=42)
 dataset_train = Dataset.from_pandas(df_train)
 dataset_val = Dataset.from_pandas(df_val)
 
+
+model_name = 'dbmdz/bert-base-italian-cased'
+model_save_name = f"{model_name.split('/')[-1]}_{dt_string}"
+print(f"model_save_name: {model_save_name}")
+
 # Load Italian BERT model and tokenizer
 model = BertForSequenceClassification.from_pretrained(
-    'dbmdz/bert-base-italian-cased',
+    model_name,
     num_labels=5
 )
-tokenizer = BertTokenizer.from_pretrained('dbmdz/bert-base-italian-cased')
+tokenizer = BertTokenizer.from_pretrained(model_name)
 
 # Preprocessing function
 def preprocess_function(examples):
@@ -105,7 +113,7 @@ training_args = TrainingArguments(
     output_dir="./results",
     num_train_epochs=num_epochs,
     per_device_train_batch_size=batch_size,
-    eval_strategy="epoch",
+    evaluation_strategy="epoch",
 )
 
 # Create trainer
@@ -134,33 +142,12 @@ predictions = trainer.predict(dataset["val"])
 preds = predictions.predictions.argmax(-1)
 true_labels = dataset["val"]["labels"]
 
-print("\nClassification Report:")
+results_save_path = os.path.join('./results', model_save_name)
+print(f"Saving classification report to: {results_save_path}")
 print(classification_report(true_labels, preds))
 
 print("\nConfusion Matrix:")
 print(confusion_matrix(true_labels, preds))
 
-"""
-Results copied here for safety (2 epochs)
-Accuracy: 0.5714285714285714
-Loss: 1.1467478275299072
-
-Classification Report:
-              precision    recall  f1-score   support
-
-           0       0.00      0.00      0.00         5
-           1       0.57      1.00      0.73        12
-           2       0.00      0.00      0.00         3
-           3       0.00      0.00      0.00         1
-
-    accuracy                           0.57        21
-   macro avg       0.14      0.25      0.18        21
-weighted avg       0.33      0.57      0.42        21
-
-
-Confusion Matrix:
-[[ 0  5  0  0]
- [ 0 12  0  0]
- [ 0  3  0  0]
- [ 0  1  0  0]]
- """
+# save model
+model.save_pretrained(os.path.join('./models', model_save_name))
