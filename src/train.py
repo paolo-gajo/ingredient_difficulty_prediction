@@ -56,6 +56,7 @@ model_name = 'dbmdz/bert-base-italian-cased'
 model_save_name = f"{model_name.split('/')[-1]}_{dt_string}"
 print(f"model_save_name: {model_save_name}")
 
+
 # Load Italian BERT model and tokenizer
 model = BertForSequenceClassification.from_pretrained(
     model_name,
@@ -142,12 +143,13 @@ predictions = trainer.predict(dataset["val"])
 preds = predictions.predictions.argmax(-1)
 true_labels = dataset["val"]["labels"]
 
-results_save_path = os.path.join('./results', model_save_name)
+results_save_path = os.path.join('./results/val', model_save_name)
 print(f"Saving classification report to: {results_save_path}")
-print(classification_report(true_labels, preds))
+print(classification_report(true_labels, preds), file = open(results_save_path, 'w', encoding='utf8'))
 
 print("\nConfusion Matrix:")
 print(confusion_matrix(true_labels, preds))
 
 # save model
 model.save_pretrained(os.path.join('./models', model_save_name))
+tokenizer.save_pretrained(os.path.join('./models', model_save_name))
