@@ -10,7 +10,7 @@ from tqdm.auto import tqdm
 from datetime import datetime
 
 # Paths
-model_name = "./models/bert-base-italian-cased_2025-01-29_21:00:49"
+model_name = "./models/bert-base-italian-cased_2025-01-29_22:29:11"
 test_data_path = "./data/gz_101.json"
 
 # Load test data
@@ -61,7 +61,7 @@ with torch.no_grad():
         true_labels.extend(labels.tolist())
 
 dt_string = '_'.join(str(datetime.now()).split('.')[0].split())
-model_save_name = f"{model_name.split('/')[-1]}_{dt_string}"
+model_save_name = f"{model_name.split('/')[-1]}"
 
 test_acc = accuracy_score(true_labels, preds)
 print(f"Test Accuracy: {test_acc:.4f}")
