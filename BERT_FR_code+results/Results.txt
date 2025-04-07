@@ -1,0 +1,32 @@
+Classification report on validation:
+                 precision    recall  f1-score   support
+
+   molto_facile       0.44      0.45      0.45       237
+         facile       0.70      0.67      0.68       811
+          media       0.51      0.58      0.54       342
+      difficile       0.29      0.23      0.26        53
+molto_difficile       1.00      0.14      0.25         7
+
+       accuracy                           0.59      1450
+      macro avg       0.59      0.41      0.44      1450
+   weighted avg       0.60      0.59      0.59      1450
+   
+   
+Accuracy on test set: 0.8614
+Classification report on test set:
+              precision    recall  f1-score   support
+
+molto_facile       0.75      0.88      0.81        17
+      facile       0.95      0.85      0.90        66
+       media       0.71      0.88      0.79        17
+   difficile       1.00      1.00      1.00         1
+
+    accuracy                           0.86       101
+   macro avg       0.85      0.90      0.87       101
+weighted avg       0.88      0.86      0.86       101
+
+Confusion matrix on test set:
+[[15  2  0  0]
+ [ 4 56  6  0]
+ [ 1  1 15  0]
+ [ 0  0  0  1]]
