@@ -10,7 +10,7 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 from transformers import BertForSequenceClassification, BertTokenizer, Trainer, TrainingArguments
 
 # 1. LOAD DATA
-train_data_path = "./data/gz_all.json"
+train_data_path = "./data/gz_all.json" #use "gz_all_no_repetitions.json"
 test_data_path = "./data/gz_101.json"
 with open(train_data_path, 'r', encoding='utf8') as f:
     data_full = json.load(f)
