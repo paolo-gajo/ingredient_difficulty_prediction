@@ -1,4 +1,5 @@
 !pip install datasets
+!pip install transformers==4.50.3 #la versione più recente (4.51.3) causa un errore
 import os
 import json
 import pandas as pd
